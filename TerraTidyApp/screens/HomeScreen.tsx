@@ -1,76 +1,83 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../App';
-
-type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
-
-type Props = {
-  navigation: HomeScreenNavigationProp;
-};
-
-interface User {
-  username: string;
-  points: number;
-  badges: string[];
-}
-
-const HomeScreen: React.FC<Props> = ({ navigation }) => {
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async (): Promise<void> => {
-    const username = await AsyncStorage.getItem('username');
-    if (username) {
-      try {
-        const response = await fetch(`http://your-backend-url/api/user/${username}`);
-        const userData: User = await response.json();
-        setUser(userData);
-      } catch (error) {
-        console.error('Failed to load user data:', error);
-      }
-    }
-  };
-
-  const addPoints = async (points: number): Promise<void> => {
-    const username = await AsyncStorage.getItem('username');
-    if (username) {
-      try {
-        const response = await fetch('http://your-backend-url/api/user/points', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, points }),
-        });
-        const updatedUser: User = await response.json();
-        setUser(updatedUser);
-      } catch (error) {
-        console.error('Failed to add points:', error);
-      }
-    }
-  };
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Camera, MapPin, Info } from 'lucide-react-native'; // If using another library, ensure it's properly installed and imported
+import CameraScreen from './CameraScreen';
+const HomeScreen: React.FC = () => {
+  const navigation = useNavigation();
 
   return (
-    <View>
-      <Text>Welcome to TerraTidy</Text>
-      {user && <Text>Points: {user.points}</Text>}
-      <Button
-        title="Scan Waste"
-        onPress={() => navigation.navigate('Camera')}
-      />
-      <Button
-        title="Find Recycling Centers"
-        onPress={() => navigation.navigate('Map')}
-      />
-      <Button
-        title="Add Points (Demo)"
-        onPress={() => addPoints(10)}
-      />
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome to TerraTidy!</Text>
+      <Text style={styles.subtitle}>Dispose waste the smart way.</Text>
+      
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity 
+          style={styles.button} 
+          // onPress={() => navigation.navigate(Camera)} // Update with correct screen name
+          activeOpacity={0.8}
+        >
+          <Camera color="#fff" size={24} />
+          <Text style={styles.buttonText}>Scan Waste</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.button} 
+          // onPress={() => navigation.navigate('MapScreen')} // Update with correct screen name
+          activeOpacity={0.8}
+        >
+          <MapPin color="#fff" size={24} />
+          <Text style={styles.buttonText}>Find Recycling Points</Text>
+        </TouchableOpacity>
+
+
+        <TouchableOpacity 
+          style={styles.button} 
+          // onPress={() => navigation.navigate('WasteInfoScreen')} // Update with correct screen name
+          activeOpacity={0.8}
+        >
+          <Info color="#fff" size={24} />
+          <Text style={styles.buttonText}>Waste Information</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F0F4F8',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#4CAF50',
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 30,
+    color: '#666',
+  },
+  buttonContainer: {
+    width: '80%',
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    marginLeft: 10,
+  },
+});
 
 export default HomeScreen;
