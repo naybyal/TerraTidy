@@ -13,12 +13,11 @@ type Props = {
 
 const CameraScreen: React.FC<Props> = ({ navigation }) => {
   const [permission, requestPermission] = useCameraPermissions();
-  const [type, setType] = useState<CameraType>('back'); // Fixed CameraType usage
+  const [type, setType] = useState<CameraType>('back');
   const [cameraReady, setCameraReady] = useState(false); 
   const cameraRef = useRef<CameraView | null>(null);
 
   useEffect(() => {
-    // Request permission automatically on component mount
     if (!permission) {
       requestPermission();
     }
