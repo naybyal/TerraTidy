@@ -1,4 +1,24 @@
 {
   "name": "TerraTidyApp",
-  "displayName": "TerraTidyApp"
+  "displayName": "TerraTidyApp",
+  "expo": {
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+        }
+      ]
+    ],
+    "ios": {
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app needs access to location when open."
+      }
+    },
+    "android": {
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+    }
+    }
+  
+  
 }
