@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Camera, MapPin, Info } from 'lucide-react-native';
 import Animated, { 
@@ -36,43 +36,81 @@ export default function HomeScreen() {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <Animated.View style={animatedStyle} className="flex-1 items-center justify-center px-6">
-        <Text className="text-4xl font-bold mb-2 text-green-500">TerraTidy</Text>
-        <Text className="text-lg mb-12 text-white opacity-80">Dispose waste the smart way</Text>
+    <SafeAreaView style={styles.container}>
+      <Animated.View style={[styles.content, animatedStyle]}>
+        <Text style={styles.title}>TerraTidy</Text>
+        <Text style={styles.subtitle}>Dispose waste the smart way</Text>
         
-        <View className="w-full space-y-4">
+        <View style={styles.buttonContainer}>
           <AnimatedTouchableOpacity 
-            style={buttonAnimatedStyle(100)}
-            className="flex-row items-center bg-green-600 p-4 rounded-lg"
+            style={[styles.button, buttonAnimatedStyle(100)]}
             activeOpacity={0.8}
             onPress={() => navigation.navigate('Camera' as never)}
           >
             <Camera color="#fff" size={24} />
-            <Text className="text-white text-lg ml-4">Scan Waste</Text>
+            <Text style={styles.buttonText}>Scan Waste</Text>
           </AnimatedTouchableOpacity>
 
           <AnimatedTouchableOpacity 
-            style={buttonAnimatedStyle(200)}
-            className="flex-row items-center bg-green-600 p-4 rounded-lg"
+            style={[styles.button, buttonAnimatedStyle(200)]}
             activeOpacity={0.8}
             onPress={() => navigation.navigate('MapScreen' as never)}
           >
             <MapPin color="#fff" size={24} />
-            <Text className="text-white text-lg ml-4">Find Recycling Points</Text>
+            <Text style={styles.buttonText}>Find Recycling Points</Text>
           </AnimatedTouchableOpacity>
 
           <AnimatedTouchableOpacity 
-            style={buttonAnimatedStyle(300)}
-            className="flex-row items-center bg-green-600 p-4 rounded-lg"
+            style={[styles.button, buttonAnimatedStyle(300)]}
             activeOpacity={0.8}
             onPress={() => navigation.navigate('WasteInfoScreen' as never)}
           >
             <Info color="#fff" size={24} />
-            <Text className="text-white text-lg ml-4">Waste Information</Text>
+            <Text style={styles.buttonText}>Waste Information</Text>
           </AnimatedTouchableOpacity>
         </View>
       </Animated.View>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'black',
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  title: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#22c55e',
+  },
+  subtitle: {
+    fontSize: 18,
+    marginBottom: 48,
+    color: 'white',
+    opacity: 0.8,
+  },
+  buttonContainer: {
+    width: '100%',
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#16a34a',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    marginLeft: 16,
+  },
+});
