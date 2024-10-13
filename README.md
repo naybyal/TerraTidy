@@ -23,7 +23,7 @@
 
    ```bash
    git clone https://github.com/yourusername/TerraTidy.git
-   cd TerraTidy
+   cd TerraTidy/terratidy-app
    ```
 
 2. Install dependencies
