@@ -1,36 +1,58 @@
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera'
-import { useRef, useState } from 'react'
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import React, { useRef, useState } from 'react';
+import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types'; // Ensure this is correctly imported
+import { useNavigation } from '@react-navigation/native';
+import { identifyWasteFromImage } from '@/components/WasteIdentifier';
+type CameraScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Camera'>;
 
 export default function CameraScreen() {
-  const [facing, setFacing] = useState<CameraType>('back')
-  const [permission, requestPermission] = useCameraPermissions()
-  const cameraRef = useRef<CameraView | null>(null)
-  const navigation = useNavigation()
-
+  const [facing, setFacing] = useState<CameraType>('back');
+  const [permission, requestPermission] = useCameraPermissions();
+  const cameraRef = useRef<CameraView | null>(null);
+  const navigation = useNavigation<CameraScreenNavigationProp>();
+  const [predictions, setPredictions] = useState<string[]>([]);
+  // If no permission object exists yet
   if (!permission) {
-    return <View />
+    return <View />;
   }
 
+  // If permission is denied, request camera permissions
   if (!permission.granted) {
     return (
       <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
+        <Text style={styles.message}>We need your permission to use the camera.</Text>
         <Button onPress={requestPermission} title="Grant Permission" />
       </View>
-    )
+    );
   }
 
+  // Function to take a picture and navigate to WasteDetails
   const takePicture = async () => {
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync()
-      navigation.navigate('WasteDetails' as never)  // Navigate to WasteDetails screen
+      const photo = await cameraRef.current.takePictureAsync();
+      if (photo) {
+        // Assuming you have a way to get predictions, replace `[]` with actual predictions
+        navigation.navigate('WasteDetails', { photoUri: photo.uri, predictions }); // Pass photoUri and predictions to WasteDetails
+      }
     }
-  }
+  };
 
+  // Toggle the camera between front and back
   const toggleCameraFacing = () => {
-    setFacing(current => (current === 'back' ? 'front' : 'back'))
+    setFacing((current) => (current === 'back' ? 'front' : 'back'));
+  };
+
+  const handleWasteIdentification = async (uri: string) => {
+    try {
+        let predictions = await identifyWasteFromImage(uri);
+        // console.log('Predictions:', predictions);
+        // Now you can use the predictions to update UI or store data
+        setPredictions(predictions);
+    } catch (error) {
+        console.error(error);
+      }
   }
 
   return (
@@ -46,7 +68,7 @@ export default function CameraScreen() {
         </View>
       </CameraView>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -62,19 +84,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonContainer: {
-    flex: 1,
     flexDirection: 'row',
-    backgroundColor: 'transparent',
-    margin: 64,
+    position: 'absolute',
+    bottom: 40,
+    left: 0,
+    right: 0,
+    justifyContent: 'space-around',
   },
   button: {
-    flex: 1,
-    alignSelf: 'flex-end',
-    alignItems: 'center',
+    backgroundColor: '#1e1e1e',
+    padding: 15,
+    borderRadius: 10,
   },
   text: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
   },
-})
+});
